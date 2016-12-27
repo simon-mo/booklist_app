@@ -8,16 +8,22 @@ def search_page(name):
     search = requests.get(search_url).text
     soup = BeautifulSoup(search, "lxml")
     link = soup.find("li", "subject-item")
-    print("Showing comments for: {}".format(link.find("div", "pub").contents[0]))
-    return link.find("a", "nbg").get('href')
+    if link:
+        print("Showing comments for following edition: {}".format(link.find("div", "pub").contents[0]))
+        return link.find("a", "nbg").get('href')
+    else:
+        print("Can't find anything!!!")
+        return None
 
 def print_comment(url):
     """Scrap Short comment from douban url"""
     test = requests.get(url).text
     soup = BeautifulSoup(test, "lxml")
     comment = soup.find_all("p", "comment-content", limit = 10)
-    for item in comment:
+    for item in set(comment):
         print("-", item.contents[0])
+    if not comment:
+        print("There's no comment.")
     return
 
 def read_print_loop():
@@ -25,9 +31,11 @@ def read_print_loop():
     while True:
         try:
             src = input('Book> ')
-            print_comment(search_page(src))
+            src = search_page(src)
+            if src:
+                print_comment(src)
             print(" ")
-        except (EOFError):
-            return
+        except (AttributeError, EOFError):
+            read_print_loop()
 
 read_print_loop()
