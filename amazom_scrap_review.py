@@ -1,34 +1,36 @@
 from bs4 import BeautifulSoup
 import requests
 
+"""This is not happening becuase amazon blocked srapping"""
+
+
 def search_page(name, n=0):
     """Input a search title, return a url"""
     name = ''.join([char if char != ' ' else '%20' for char in str(name)])
-    search_url = 'http://book.douban.com/subject_search?search_text={}&cat=1002'.format(name)
+    search_url ='https://www.amazon.com/s/ref=nb_sb_noss?url=search-alias%3Dstripbooks&field-keywords={}&rh=n%3A283155%2Ck%3A{}'.format(name,name)
     search = requests.get(search_url).text
     soup = BeautifulSoup(search, "lxml")
-    link = soup.find("li", "subject-item")
+    link = soup.find("div", id = "searchTemplate").find("li", "s-result-item celwidget",id = "result_0")
     if link:
-        print("Book title: {}".format(link.find("h2","").find("a").get("title")))
-        print("Showing comments for following edition: {}".format(link.find("div", "pub").contents[0]))
-        return link.find("a", "nbg").get('href')
+        print("Book title: {}".format(link.find("a","a-link-normal s-access-detail-page  a-text-normal").get("title")))
+        return link.find("a","a-link-normal s-access-detail-page a-text-normal").get("href")
     else:
         print("Can't find anything!!!")
         return None
 
 def print_comment(url):
-    """Scrap Short comment from douban url"""
+    """Scrap Short comment from amazon url"""
     test = requests.get(url).text
     soup = BeautifulSoup(test, "lxml")
-    comment = soup.find_all("p", "comment-content", limit = 10)
+    comment = soup.find("div", id="revMHRL").find_all("div", "a-row a-spacing-small")
     for item in set(comment):
-        print("-", item.contents[0])
+        print("-", item.find("div", "a-section").contents[0])
     if not comment:
         print("There's no comment.")
     return
 
 def read_print_loop():
-    """Read a douban book number and return the comment"""
+    """Read a Amazon book Name and return the comment"""
     while True:
         try:
             src = input('Book> ')
@@ -42,3 +44,4 @@ def read_print_loop():
             read_print_loop()
 
 read_print_loop()
+
