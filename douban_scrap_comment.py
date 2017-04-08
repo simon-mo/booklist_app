@@ -29,13 +29,18 @@ def print_comment(url):
 
 def read_print_loop():
     """Read a douban book number and return the comment"""
+    recent_input = ""
     while True:
         try:
             src = input('Book> ')
             if src == "Q":
                 return None
-            src = search_page(src)
-            if src:
+            elif src == "^[[A" :
+                src = search_page(recent_input)
+                print_comment(src)
+            elif src:
+                recent_input = src
+                src = search_page(src)
                 print_comment(src)
             print(" ")
         except (AttributeError, EOFError):
