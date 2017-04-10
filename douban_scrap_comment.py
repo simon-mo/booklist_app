@@ -35,9 +35,6 @@ def read_print_loop():
             src = input('Book> ')
             if src == "Q":
                 return None
-            elif src == "^[[A" :
-                src = search_page(recent_input)
-                print_comment(src)
             elif src:
                 recent_input = src
                 src = search_page(src)
